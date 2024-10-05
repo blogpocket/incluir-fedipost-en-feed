@@ -16,6 +16,9 @@ function ctpff_incluir_tipos_en_feed_general($query) {
            if (is_array($post_type)) {
                // Se modifica la consulta para que admita todos los tipos de datos seleccionados
                $post_types = get_option('ctpff_post_types');
+               if (empty($post_types)) {
+                $post_types = array('post');
+               }
                $query->set('post_type', $post_types);
            } else {
                // NO se modifica la consulta y solo admitirá el tipo de datos en cuestión
