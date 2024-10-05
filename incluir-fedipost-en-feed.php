@@ -2,7 +2,7 @@
 /*
 Plugin Name: Controlar Tipos de Post en Feed General
 Description: Permite al administrador seleccionar qué tipos de post personalizados se incluyen en el feed RSS general.
-Version: 1.2
+Version: 1.3
 Author: A. Cambronero Blogpocket.com
 */
 
@@ -11,24 +11,21 @@ if (!defined('ABSPATH')) exit;
 
 // Función para modificar la consulta del feed
 function ctpff_incluir_tipos_en_feed_general($query) {
-    if ($query->is_feed() && $query->is_main_query() && !is_admin()) {
-        // Verificar si estamos en el feed principal
-        // El feed principal no tiene 'post_type' especificado en las query vars
-        $post_type = $query->get('post_type');
-
-        // Si 'post_type' no está establecido o es 'post', estamos en el feed general
-        if (empty($post_type) || $post_type === 'post') {
-            $post_types = get_option('ctpff_post_types');
-
-            if (empty($post_types)) {
-                $post_types = array('post');
-            }
-
-            $query->set('post_type', $post_types);
-        }
+    $post_type = $query->get('post_type');
+    if ($query->is_feed() && $query->is_main_query() ) {
+           if (is_array($post_type)) {
+               // Se modifica la consulta para que admita todos los tipos de datos seleccionados
+               $post_types = get_option('ctpff_post_types');
+               $query->set('post_type', $post_types);
+           } else {
+               // NO se modifica la consulta y solo admitirá el tipo de datos en cuestión
+               $query->set('post_type', $post_type);
+           }
     }
 }
+
 add_action('pre_get_posts', 'ctpff_incluir_tipos_en_feed_general');
+
 
 // Añadir página de opciones al menú de ajustes
 function ctpff_add_settings_page() {
